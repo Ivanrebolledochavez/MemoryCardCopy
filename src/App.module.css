@@ -1,0 +1,19 @@
+.card-container{
+    background-color: chocolate;
+    min-height: 100vh;   
+    display: flex;
+    align-items: center;
+    justify-content:center;
+    align-content:center;       
+    flex-wrap: wrap;
+    
+    
+}
+.gameOver{
+    font-size: 50px;
+    
+}
+
+
+
+

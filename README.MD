@@ -1,0 +1,1 @@
+the following project is the memory card project for the the Project Odin website.
