@@ -10,7 +10,19 @@ function App() {
   const [cardsClicked, setCardsCliked] = useState([]);
   const [playing, setPlaying] = useState(true);
   const [gameOver, setGameOver] = useState(false);
-  const gameOverMessage = <h1 className={classes.gameOver}>Game Over</h1>;
+  const handlerestartGame = () => {
+    setPlaying(true);
+    setGameOver(false);
+    setScore(0);
+    setCardsData([]);
+    setCardsCliked([]);
+  };
+  const gameOverMessage = (
+    <div>
+      <h1 className={classes.gameOver}>Game Over</h1>
+      <button onClick={handlerestartGame}>Restart Game</button>
+    </div>
+  );
   const [score, setScore] = useState(0);
 
   //function to shuffle an array
@@ -31,7 +43,7 @@ function App() {
     const GetCardsData = async () => {
       try {
         const results = await fetch(
-          "https://rickandmortyapi.com/api/character/[1,2,3,4,5,6,7,8,9,10]"
+          "https://rickandmortyapi.com/api/character/[1,2,3,4,5,6,7,8,9,10,11,12]"
         );
         if (!results.ok) {
           throw new Error("something went wrong");
@@ -44,7 +56,7 @@ function App() {
       }
     };
     GetCardsData();
-  }, []);
+  }, [playing]);
 
   const handleOnClick = (event, data) => {
     //check if curent card is in previous cards clicked if not add this card to previous cards cliked
@@ -64,7 +76,7 @@ function App() {
       <Header score={score} />
       <main className={classes["card-container"]}>
         {playing &&
-          cardsData.map((data) => (
+          cardsData.map((data, index) => (
             <Card
               data={data}
               key={data.id}
