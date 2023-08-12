@@ -8,19 +8,20 @@ function App() {
   const [cardsData, setCardsData] = useState([]);
   //add an empty array to hold the cards that had been clicked
   const [cardsClicked, setCardsClicked] = useState([]);
-  const [playing, setPlaying] = useState(true);
+  const [startGame, setStartGame] = useState(true);
   const [gameOver, setGameOver] = useState(false);
+  const [reStartGame, setReStartGame] = useState(false);
   const [score, setScore] = useState(0);
-  // const [maxScore, setMaxScore] = useState(0);
+  const [maxScore, setMaxScore] = useState(0);
 
   const handleRestartGame = () => {
     setCardsData([]);
     setCardsClicked([]);
-    setPlaying(true);
     setGameOver(false);
     setScore(0);
-    // setMaxScore(0);
+    setStartGame(true);
   };
+
   //make this a separate component
   const gameOverMessage = (
     <div>
@@ -29,7 +30,7 @@ function App() {
     </div>
   );
 
-  //function to shuffle an array
+  //function to shuffle an array of any length  using the Fisher-Yates Sorting Algorithm
   const shuffle = (array) => {
     const shuffledArray = [...array];
     for (let i = shuffledArray.length - 1; i > 0; i--) {
@@ -43,25 +44,25 @@ function App() {
   };
 
   //function to get an array of random numbers
+  //I need to update this  seems to work but it looks complicated the way I'm implementing this function
   const randomArray = () => {
     const randomNumbersArray = [];
-    for (let i = 0; i < 6; i++) {
-      let randomNumber = Math.floor(Math.random() * 24) + 1;
-      //if random number is included on array add 1
+    for (let i = 0; i < 5; i++) {
+      let randomNumber = Math.floor(Math.random() * 48) + 1;
+      //if random number is included on array
       if (randomNumbersArray.includes(randomNumber)) {
         randomNumber = randomNumber + randomNumber;
       }
       randomNumbersArray.push(randomNumber);
     }
-
     return randomNumbersArray;
   };
 
   //get cards data from API
   useEffect(() => {
+    setReStartGame(false);
     const GetCardsData = async () => {
       const charactersId = randomArray();
-      console.log(charactersId);
       try {
         const results = await fetch(
           `https://rickandmortyapi.com/api/character/${charactersId}`
@@ -71,20 +72,38 @@ function App() {
         }
         const data = await results.json();
         setCardsData(data);
-        setCardsData((prevCardsData) => shuffle(prevCardsData));
+        setCardsData((prev) => shuffle(prev));
       } catch (error) {
         console.log(error);
       }
     };
     GetCardsData();
-  }, [playing]);
+  }, [reStartGame, startGame]);
+
+  //render Max score when score changes
+  useEffect(() => {
+    setMaxScore((prevMAxScore) => Math.max(prevMAxScore, score));
+  }, [score]);
 
   const handleOnClick = (event, data) => {
     //check if curent card is in previous cards clicked if not add this card to previous cards cliked
     //if currect card cliked is on the previus cards cliked array game over
+    if (cardsClicked.length === cardsData.length - 1) {
+      setScore(score + 1);
+      console.log("if all  cards clicked  restartGame");
+      setReStartGame(true);
+      setCardsData([]);
+      setCardsClicked([]);
+      setGameOver(false);
+      return;
+    }
     if (cardsClicked.some((clickedCard) => clickedCard.id === data.id)) {
       setGameOver(true);
-      setPlaying(false);
+      setStartGame(false);
+      setCardsData([]);
+      setCardsClicked([]);
+
+      return;
     } else {
       setCardsClicked((prev) => [...prev, data]);
       setScore(score + 1);
@@ -94,9 +113,9 @@ function App() {
   };
   return (
     <Fragment>
-      <Header score={score} />
+      <Header score={score} maxScore={maxScore} />
       <main className={classes["card-container"]}>
-        {playing &&
+        {startGame &&
           cardsData.map((data) => (
             <Card
               data={data}
