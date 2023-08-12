@@ -10,20 +10,24 @@ function App() {
   const [cardsClicked, setCardsCliked] = useState([]);
   const [playing, setPlaying] = useState(true);
   const [gameOver, setGameOver] = useState(false);
+  const [score, setScore] = useState(0);
+  const [maxScore, setMaxScore] = useState(0);
+
   const handlerestartGame = () => {
+    setCardsData([]);
+    setCardsCliked([]);
     setPlaying(true);
     setGameOver(false);
     setScore(0);
-    setCardsData([]);
-    setCardsCliked([]);
+    setMaxScore(0);
   };
+  //make this a separate component
   const gameOverMessage = (
     <div>
       <h1 className={classes.gameOver}>Game Over</h1>
       <button onClick={handlerestartGame}>Restart Game</button>
     </div>
   );
-  const [score, setScore] = useState(0);
 
   //function to shuffle an array
   const shuffle = (array) => {
@@ -38,12 +42,29 @@ function App() {
     return shuffledArray;
   };
 
+  //function to get an array of random numbers
+  const randomArray = () => {
+    const randomNumbersArray = [];
+    for (let i = 0; i < 6; i++) {
+      let randomNumber = Math.floor(Math.random() * 24) + 1;
+      //if random number is included on array add 1
+      if (randomNumbersArray.includes(randomNumber)) {
+        randomNumber = randomNumber + randomNumber;
+      }
+      randomNumbersArray.push(randomNumber);
+    }
+
+    return randomNumbersArray;
+  };
+
   //get cards data from API
   useEffect(() => {
     const GetCardsData = async () => {
+      const charactersId = randomArray();
+      console.log(charactersId);
       try {
         const results = await fetch(
-          "https://rickandmortyapi.com/api/character/[1,2,3,4,5,6,7,8,9,10,11,12]"
+          `https://rickandmortyapi.com/api/character/${charactersId}`
         );
         if (!results.ok) {
           throw new Error("something went wrong");
