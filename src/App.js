@@ -7,25 +7,25 @@ function App() {
   //add an empty array that will hold and array of objects to create the cards.
   const [cardsData, setCardsData] = useState([]);
   //add an empty array to hold the cards that had been clicked
-  const [cardsClicked, setCardsCliked] = useState([]);
+  const [cardsClicked, setCardsClicked] = useState([]);
   const [playing, setPlaying] = useState(true);
   const [gameOver, setGameOver] = useState(false);
   const [score, setScore] = useState(0);
-  const [maxScore, setMaxScore] = useState(0);
+  // const [maxScore, setMaxScore] = useState(0);
 
-  const handlerestartGame = () => {
+  const handleRestartGame = () => {
     setCardsData([]);
-    setCardsCliked([]);
+    setCardsClicked([]);
     setPlaying(true);
     setGameOver(false);
     setScore(0);
-    setMaxScore(0);
+    // setMaxScore(0);
   };
   //make this a separate component
   const gameOverMessage = (
     <div>
       <h1 className={classes.gameOver}>Game Over</h1>
-      <button onClick={handlerestartGame}>Restart Game</button>
+      <button onClick={handleRestartGame}>Restart Game</button>
     </div>
   );
 
@@ -86,7 +86,7 @@ function App() {
       setGameOver(true);
       setPlaying(false);
     } else {
-      setCardsCliked((prev) => [...prev, data]);
+      setCardsClicked((prev) => [...prev, data]);
       setScore(score + 1);
       //suffle card Deck
       setCardsData((prevCardsData) => shuffle(prevCardsData));
@@ -97,7 +97,7 @@ function App() {
       <Header score={score} />
       <main className={classes["card-container"]}>
         {playing &&
-          cardsData.map((data, index) => (
+          cardsData.map((data) => (
             <Card
               data={data}
               key={data.id}
