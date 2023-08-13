@@ -2,128 +2,88 @@ import { Fragment, useEffect, useState } from "react";
 import classes from "./App.module.css";
 import Header from "./components/Header";
 import Card from "./components/Card";
+import GameOver from "./components/GameOver";
+import getCardsData from "./helpers/getApiData";
+import shuffleArray from "./helpers/shuffleArray";
+import randomNumbersArray from "./helpers/randomNumbersArray";
 
 function App() {
   //add an empty array that will hold and array of objects to create the cards.
   const [cardsData, setCardsData] = useState([]);
   //add an empty array to hold the cards that had been clicked
   const [cardsClicked, setCardsClicked] = useState([]);
-  const [startGame, setStartGame] = useState(true);
+
+  const [gameIsActive, setGameIsActive] = useState(true);
   const [gameOver, setGameOver] = useState(false);
-  const [reStartGame, setReStartGame] = useState(false);
+  const [shuffleCards, setShuffleCards] = useState(false);
   const [score, setScore] = useState(0);
   const [maxScore, setMaxScore] = useState(0);
 
+  //Handle Restart after game over
   const handleRestartGame = () => {
     setCardsData([]);
     setCardsClicked([]);
+    setGameIsActive(true);
     setGameOver(false);
     setScore(0);
-    setStartGame(true);
-  };
-
-  //make this a separate component
-  const gameOverMessage = (
-    <div>
-      <h1 className={classes.gameOver}>Game Over</h1>
-      <button onClick={handleRestartGame}>Restart Game</button>
-    </div>
-  );
-
-  //function to shuffle an array of any length  using the Fisher-Yates Sorting Algorithm
-  const shuffle = (array) => {
-    const shuffledArray = [...array];
-    for (let i = shuffledArray.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffledArray[i], shuffledArray[j]] = [
-        shuffledArray[j],
-        shuffledArray[i],
-      ];
-    }
-    return shuffledArray;
-  };
-
-  //function to get an array of random numbers
-  //I need to update this  seems to work but it looks complicated the way I'm implementing this function
-  const randomArray = () => {
-    const randomNumbersArray = [];
-    for (let i = 0; i < 5; i++) {
-      let randomNumber = Math.floor(Math.random() * 48) + 1;
-      //if random number is included on array
-      if (randomNumbersArray.includes(randomNumber)) {
-        randomNumber = randomNumber + randomNumber;
-      }
-      randomNumbersArray.push(randomNumber);
-    }
-    return randomNumbersArray;
+    setShuffleCards(!shuffleCards);
   };
 
   //get cards data from API
   useEffect(() => {
-    setReStartGame(false);
-    const GetCardsData = async () => {
-      const charactersId = randomArray();
+    const fethData = async () => {
       try {
-        const results = await fetch(
-          `https://rickandmortyapi.com/api/character/${charactersId}`
-        );
-        if (!results.ok) {
-          throw new Error("something went wrong");
-        }
-        const data = await results.json();
-        setCardsData(data);
-        setCardsData((prev) => shuffle(prev));
+        const charactersId = randomNumbersArray();
+        const data = await getCardsData(charactersId);
+        const shuffledCards = shuffleArray(data);
+        setCardsData(shuffledCards);
       } catch (error) {
         console.log(error);
       }
     };
-    GetCardsData();
-  }, [reStartGame, startGame]);
+    fethData();
+  }, [shuffleCards]);
 
   //render Max score when score changes
   useEffect(() => {
     setMaxScore((prevMAxScore) => Math.max(prevMAxScore, score));
   }, [score]);
 
-  const handleOnClick = (event, data) => {
-    //check if curent card is in previous cards clicked if not add this card to previous cards cliked
-    //if currect card cliked is on the previus cards cliked array game over
-    if (cardsClicked.length === cardsData.length - 1) {
+  const handleOnCardClick = (event, data) => {
+    if (cardsClicked.length + 1 === cardsData.length) {
+      //if all cards clicked on this deck of cards get new cards
       setScore(score + 1);
-      console.log("if all  cards clicked  restartGame");
-      setReStartGame(true);
       setCardsData([]);
       setCardsClicked([]);
-      setGameOver(false);
+      setShuffleCards(!shuffleCards);
       return;
     }
     if (cardsClicked.some((clickedCard) => clickedCard.id === data.id)) {
+      //show game over message
       setGameOver(true);
-      setStartGame(false);
-      setCardsData([]);
-      setCardsClicked([]);
-
+      setGameIsActive(false);
       return;
     } else {
+      //active game
       setCardsClicked((prev) => [...prev, data]);
       setScore(score + 1);
-      //suffle card Deck
-      setCardsData((prevCardsData) => shuffle(prevCardsData));
+      //suffle existing card Deck
+      setCardsData((prevCardsData) => shuffleArray(prevCardsData));
     }
   };
   return (
     <Fragment>
       <Header score={score} maxScore={maxScore} />
       <main className={classes["card-container"]}>
-        {startGame &&
+        {gameIsActive &&
           cardsData.map((data) => (
             <Card
               data={data}
               key={data.id}
-              onClick={(event) => handleOnClick(event, data)}
+              onClick={(event) => handleOnCardClick(event, data)}
             />
           ))}
-        {gameOver && gameOverMessage}
+        {gameOver && <GameOver onClick={handleRestartGame} />}
       </main>
     </Fragment>
   );
