@@ -1,11 +1,11 @@
 import { Fragment, useEffect, useState } from "react";
-import classes from "./App.module.css";
+// import classes from "./App.module.css";
 import Header from "./components/Header";
-import Card from "./components/Card";
 import GameOver from "./components/GameOver";
 import getCardsData from "./helpers/getApiData";
 import shuffleArray from "./helpers/shuffleArray";
 import randomNumbersArray from "./helpers/randomNumbersArray";
+import CardDeck from "./components/CardDeck";
 
 function App() {
   //add an empty array that will hold and array of objects to create the cards.
@@ -74,17 +74,10 @@ function App() {
   return (
     <Fragment>
       <Header score={score} maxScore={maxScore} />
-      <main className={classes["card-container"]}>
-        {gameIsActive &&
-          cardsData.map((data) => (
-            <Card
-              data={data}
-              key={data.id}
-              onClick={(event) => handleOnCardClick(event, data)}
-            />
-          ))}
-        {gameOver && <GameOver onClick={handleRestartGame} />}
-      </main>
+      {gameIsActive && (
+        <CardDeck onCardClick={handleOnCardClick} cardsData={cardsData} />
+      )}
+      {gameOver && <GameOver onClick={handleRestartGame} />}
     </Fragment>
   );
 }
