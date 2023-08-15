@@ -6,6 +6,7 @@ import getCardsData from "./helpers/getApiData";
 import shuffleArray from "./helpers/shuffleArray";
 import randomNumbersArray from "./helpers/randomNumbersArray";
 import CardDeck from "./components/CardDeck";
+import GameStart from "./components/GameStart";
 
 function App() {
   //add an empty array that will hold and array of objects to create the cards.
@@ -13,11 +14,20 @@ function App() {
   //add an empty array to hold the cards that had been clicked
   const [cardsClicked, setCardsClicked] = useState([]);
 
-  const [gameIsActive, setGameIsActive] = useState(true);
+  const [gameIsActive, setGameIsActive] = useState(false);
   const [gameOver, setGameOver] = useState(false);
   const [shuffleCards, setShuffleCards] = useState(false);
   const [score, setScore] = useState(0);
   const [maxScore, setMaxScore] = useState(0);
+  const [level, setLevel] = useState(0);
+
+  const [ShowStartGame, setShowStartGame] = useState(true);
+
+  const handleStartGame = () => {
+    setGameIsActive(true);
+    setShowStartGame(false);
+    setLevel(1);
+  };
 
   //Handle Restart after game over
   const handleRestartGame = () => {
@@ -27,6 +37,7 @@ function App() {
     setGameOver(false);
     setScore(0);
     setShuffleCards(!shuffleCards);
+    setLevel(1);
   };
 
   //get cards data from API
@@ -44,9 +55,14 @@ function App() {
     fethData();
   }, [shuffleCards]);
 
-  //render Max score when score changes
+  //render Max score when score changes and current level
   useEffect(() => {
+    const numberOfCards = 5;
     setMaxScore((prevMAxScore) => Math.max(prevMAxScore, score));
+    if (score % numberOfCards === 0 && score !== 0) {
+      // setLevel((numberOfCards + 5) / numberOfCards);
+      setLevel((prev) => prev + 1);
+    }
   }, [score]);
 
   const handleOnCardClick = (event, data) => {
@@ -73,7 +89,8 @@ function App() {
   };
   return (
     <Fragment>
-      <Header score={score} maxScore={maxScore} />
+      <Header score={score} maxScore={maxScore} level={level} />
+      {ShowStartGame && <GameStart onClick={handleStartGame} />}
       {gameIsActive && (
         <CardDeck onCardClick={handleOnCardClick} cardsData={cardsData} />
       )}
