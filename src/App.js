@@ -55,7 +55,7 @@ function App() {
       }
     };
     fethData();
-  }, [shuffleCards]);
+  }, [shuffleCards, cardsToRetrieve]);
 
   //render Max score when score changes and current level
   useEffect(() => {
