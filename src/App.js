@@ -15,18 +15,20 @@ function App() {
   const [cardsClicked, setCardsClicked] = useState([]);
 
   const [gameIsActive, setGameIsActive] = useState(false);
-  const [gameOver, setGameOver] = useState(false);
+  const [gameIsOver, setGameIsOver] = useState(false);
   const [shuffleCards, setShuffleCards] = useState(false);
   const [score, setScore] = useState(0);
   const [maxScore, setMaxScore] = useState(0);
-  const [level, setLevel] = useState(0);
+  const [level, setLevel] = useState(1);
+  const [cardsToRetrieve, setCardsToRetrieve] = useState(2);
 
-  const [ShowStartGame, setShowStartGame] = useState(true);
+  const [showStartScreen, setShowStartScreen] = useState(true);
+  const [showScore, setShowScore] = useState(false);
 
   const handleStartGame = () => {
+    setShowScore(true);
     setGameIsActive(true);
-    setShowStartGame(false);
-    setLevel(1);
+    setShowStartScreen(false);
   };
 
   //Handle Restart after game over
@@ -34,7 +36,7 @@ function App() {
     setCardsData([]);
     setCardsClicked([]);
     setGameIsActive(true);
-    setGameOver(false);
+    setGameIsOver(false);
     setScore(0);
     setShuffleCards(!shuffleCards);
     setLevel(1);
@@ -44,7 +46,7 @@ function App() {
   useEffect(() => {
     const fethData = async () => {
       try {
-        const charactersId = randomNumbersArray();
+        const charactersId = randomNumbersArray(cardsToRetrieve);
         const data = await getCardsData(charactersId);
         const shuffledCards = shuffleArray(data);
         setCardsData(shuffledCards);
@@ -57,12 +59,7 @@ function App() {
 
   //render Max score when score changes and current level
   useEffect(() => {
-    const numberOfCards = 5;
     setMaxScore((prevMAxScore) => Math.max(prevMAxScore, score));
-    if (score % numberOfCards === 0 && score !== 0) {
-      // setLevel((numberOfCards + 5) / numberOfCards);
-      setLevel((prev) => prev + 1);
-    }
   }, [score]);
 
   const handleOnCardClick = (event, data) => {
@@ -72,12 +69,15 @@ function App() {
       setCardsData([]);
       setCardsClicked([]);
       setShuffleCards(!shuffleCards);
+      setCardsToRetrieve((prev) => prev * 2);
+      setLevel((prev) => prev + 1);
       return;
     }
     if (cardsClicked.some((clickedCard) => clickedCard.id === data.id)) {
       //show game over message
-      setGameOver(true);
+      setGameIsOver(true);
       setGameIsActive(false);
+      setCardsToRetrieve(2);
       return;
     } else {
       //active game
@@ -89,12 +89,12 @@ function App() {
   };
   return (
     <Fragment>
-      <Header score={score} maxScore={maxScore} level={level} />
-      {ShowStartGame && <GameStart onClick={handleStartGame} />}
+      {showScore && <Header score={score} maxScore={maxScore} level={level} />}
+      {showStartScreen && <GameStart onClick={handleStartGame} />}
       {gameIsActive && (
         <CardDeck onCardClick={handleOnCardClick} cardsData={cardsData} />
       )}
-      {gameOver && <GameOver onClick={handleRestartGame} />}
+      {gameIsOver && <GameOver onClick={handleRestartGame} />}
     </Fragment>
   );
 }

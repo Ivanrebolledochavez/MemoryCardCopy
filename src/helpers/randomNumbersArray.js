@@ -1,6 +1,6 @@
-const randomNumbersArray = () => {
+const randomNumbersArray = (numberOfCards) => {
   const randomNumberSet = new Set();
-  const arrayLength = 5;
+  const arrayLength = numberOfCards;
   const maxRandomNumber = 820;
 
   while (randomNumberSet.size < arrayLength) {
