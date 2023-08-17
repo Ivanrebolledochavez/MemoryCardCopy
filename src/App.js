@@ -1,12 +1,11 @@
 import { Fragment, useEffect, useState } from "react";
 // import classes from "./App.module.css";
 import Header from "./components/Header";
-import GameOver from "./components/GameOver";
 import getCardsData from "./helpers/getApiData";
 import shuffleArray from "./helpers/shuffleArray";
 import randomNumbersArray from "./helpers/randomNumbersArray";
 import CardDeck from "./components/CardDeck";
-import GameStart from "./components/GameStart";
+import Modal from "./components/Modal";
 
 function App() {
   //add an empty array that will hold and array of objects to create the cards.
@@ -14,39 +13,41 @@ function App() {
   //add an empty array to hold the cards that had been clicked
   const [cardsClicked, setCardsClicked] = useState([]);
 
-  const [gameIsActive, setGameIsActive] = useState(false);
-  const [gameIsOver, setGameIsOver] = useState(false);
+  const [gameIsActive, setGameIsActive] = useState(true);
   const [shuffleCards, setShuffleCards] = useState(false);
   const [score, setScore] = useState(0);
   const [maxScore, setMaxScore] = useState(0);
   const [level, setLevel] = useState(1);
-  const [cardsToRetrieve, setCardsToRetrieve] = useState(2);
-
-  const [showStartScreen, setShowStartScreen] = useState(true);
-  const [showScore, setShowScore] = useState(false);
-
-  const handleStartGame = () => {
-    setShowScore(true);
-    setGameIsActive(true);
-    setShowStartScreen(false);
-  };
+  //maybe chage this name to number of cards?
+  const [cardsToRetrieve, setCardsToRetrieve] = useState(4);
+  const maxRandomNumber = 820;
+  const [showGameOver, setShowGameOver] = useState(false);
+  const [showWinMessage, setShowWinMessage] = useState(false);
 
   //Handle Restart after game over
   const handleRestartGame = () => {
     setCardsData([]);
     setCardsClicked([]);
     setGameIsActive(true);
-    setGameIsOver(false);
+    setShowGameOver(false);
     setScore(0);
-    setShuffleCards(!shuffleCards);
     setLevel(1);
+    setCardsToRetrieve(4);
+    setShuffleCards(!shuffleCards);
+  };
+
+  const handleWin = () => {
+    setShowWinMessage(false);
   };
 
   //get cards data from API
   useEffect(() => {
     const fethData = async () => {
       try {
-        const charactersId = randomNumbersArray(cardsToRetrieve);
+        const charactersId = randomNumbersArray(
+          cardsToRetrieve,
+          maxRandomNumber
+        );
         const data = await getCardsData(charactersId);
         const shuffledCards = shuffleArray(data);
         setCardsData(shuffledCards);
@@ -63,21 +64,21 @@ function App() {
   }, [score]);
 
   const handleOnCardClick = (event, data) => {
+    if (cardsClicked.some((clickedCard) => clickedCard.id === data.id)) {
+      //show game over message
+      setShowGameOver(true);
+      return;
+    }
+
     if (cardsClicked.length + 1 === cardsData.length) {
       //if all cards clicked on this deck of cards get new cards
+      setShowWinMessage(true);
       setScore(score + 1);
       setCardsData([]);
       setCardsClicked([]);
-      setShuffleCards(!shuffleCards);
-      setCardsToRetrieve((prev) => prev * 2);
+      setCardsToRetrieve((prev) => prev + 4);
       setLevel((prev) => prev + 1);
-      return;
-    }
-    if (cardsClicked.some((clickedCard) => clickedCard.id === data.id)) {
-      //show game over message
-      setGameIsOver(true);
-      setGameIsActive(false);
-      setCardsToRetrieve(2);
+      setShuffleCards(!shuffleCards);
       return;
     } else {
       //active game
@@ -89,12 +90,24 @@ function App() {
   };
   return (
     <Fragment>
-      {showScore && <Header score={score} maxScore={maxScore} level={level} />}
-      {showStartScreen && <GameStart onClick={handleStartGame} />}
+      <Header score={score} maxScore={maxScore} level={level} />
       {gameIsActive && (
         <CardDeck onCardClick={handleOnCardClick} cardsData={cardsData} />
       )}
-      {gameIsOver && <GameOver onClick={handleRestartGame} />}
+      {showGameOver && (
+        <Modal
+          mainMessage="GameOver"
+          buttonText="restart"
+          onClick={handleRestartGame}
+        />
+      )}
+      {showWinMessage && (
+        <Modal
+          mainMessage="Congratulations!! you Win"
+          buttonText="continue"
+          onClick={handleWin}
+        />
+      )}
     </Fragment>
   );
 }
