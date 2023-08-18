@@ -6,8 +6,18 @@ import shuffleArray from "./helpers/shuffleArray";
 import randomNumbersArray from "./helpers/randomNumbersArray";
 import CardDeck from "./components/CardDeck";
 import Modal from "./components/Modal";
-
+import useSound from "use-sound";
+import cardClickSound from "./music/cardClick.mp3";
+import cardShufflingSound from "./music/cards-shuffling.mp3";
+import winMessageSound from "./music/levelCompleted.mp3";
+import gameOverSound from "./music/gameOver.mp3";
+// import mainMusic from "./music/mainMusic.mp3";
 function App() {
+  const [clickSound] = useSound(cardClickSound);
+  const [shufflingSound] = useSound(cardShufflingSound);
+  const [winSound] = useSound(winMessageSound);
+  const [overSound] = useSound(gameOverSound);
+  // const [gameMusic] = useSound(mainMusic);
   //add an empty array that will hold and array of objects to create the cards.
   const [cardsData, setCardsData] = useState([]);
   //add an empty array to hold the cards that had been clicked
@@ -38,6 +48,13 @@ function App() {
 
   const handleWin = () => {
     setShowWinMessage(false);
+    setScore(score + 1);
+    setCardsData([]);
+    setCardsClicked([]);
+    setCardsToRetrieve((prev) => prev + 4);
+    setLevel((prev) => prev + 1);
+    setShuffleCards(!shuffleCards);
+    shufflingSound();
   };
 
   //get cards data from API
@@ -50,6 +67,7 @@ function App() {
         );
         const data = await getCardsData(charactersId);
         const shuffledCards = shuffleArray(data);
+        shufflingSound();
         setCardsData(shuffledCards);
       } catch (error) {
         console.log(error);
@@ -67,20 +85,18 @@ function App() {
     if (cardsClicked.some((clickedCard) => clickedCard.id === data.id)) {
       //show game over message
       setShowGameOver(true);
+      overSound();
+
       return;
     }
 
     if (cardsClicked.length + 1 === cardsData.length) {
       //if all cards clicked on this deck of cards get new cards
       setShowWinMessage(true);
-      setScore(score + 1);
-      setCardsData([]);
-      setCardsClicked([]);
-      setCardsToRetrieve((prev) => prev + 4);
-      setLevel((prev) => prev + 1);
-      setShuffleCards(!shuffleCards);
+      winSound();
       return;
     } else {
+      clickSound();
       //active game
       setCardsClicked((prev) => [...prev, data]);
       setScore(score + 1);
