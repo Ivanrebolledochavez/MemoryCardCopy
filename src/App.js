@@ -58,6 +58,8 @@ function App() {
   };
 
   //get cards data from API
+  /* eslint-disable react-hooks/exhaustive-deps */
+
   useEffect(() => {
     const fethData = async () => {
       try {
@@ -75,6 +77,7 @@ function App() {
     };
     fethData();
   }, [shuffleCards, cardsToRetrieve]);
+  /* eslint-disable react-hooks/exhaustive-deps */
 
   //render Max score when score changes and current level
   useEffect(() => {
