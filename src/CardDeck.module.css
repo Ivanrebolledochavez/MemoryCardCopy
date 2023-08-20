@@ -1,0 +1,16 @@
+.card-container{
+    background-color: white;
+    min-height: 40vh;
+    border-radius: 8px;   
+    display: flex;
+    align-items: center;
+    justify-content:center;   
+    flex-wrap: wrap;  
+    max-width: 600px; 
+    margin: 0 auto;
+    
+}
+
+
+
+

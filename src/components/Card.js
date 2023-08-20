@@ -1,10 +1,16 @@
 import classes from "./Card.module.css";
-const Card = ({ data, onClick }) => {
+import ReactCardFlip from "react-card-flip";
+import backImage from "../images/back.jpeg";
+const Card = ({ data, onClick, flip }) => {
   return (
-    <div className={classes.card} onClick={onClick}>
-      <img src={data.image} alt="character from api" />
-      {/* <h4>{data.name}</h4> */}
-    </div>
+    <ReactCardFlip isFlipped={flip} flipDirection="horizontal">
+      <div className={classes.card} onClick={onClick}>
+        <img src={data.image} alt="character from api" />
+      </div>
+      <div className={classes.card}>
+        <img src={backImage} alt="back of card" />
+      </div>
+    </ReactCardFlip>
   );
 };
 export default Card;

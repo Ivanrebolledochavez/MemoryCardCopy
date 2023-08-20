@@ -1,11 +1,12 @@
 .header{
-    background-color:chocolate;
+    background-color: white;
+    border-radius: 8px;
     min-height: 100px;
+    max-width: 600px;
     display: flex;
     flex-direction: column;
-    align-items:center;    
-    justify-content:space-around;
-   
+    align-self: center;
+    margin: 50px auto;   
 }
 h1{
    font-size: 50px;

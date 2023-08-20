@@ -11,14 +11,35 @@
     align-items: center;
 }
 
-.main-modal{
-    background-color: white;
+.main-modal{  
+
+   position: absolute;
+   display: flex;
+   flex-direction: column;
+   justify-content: center;
+   align-items: center;
+   overflow: hidden;    
+   max-width: 600px;   
+   height: 400px;
+   margin: 20px;
+   border-radius: 18px;   
+   text-align: center;
+  color: black;
+   
+}
+
+
+.message{
+    position:absolute;
+    top: 40%;
+
+}
+
+.button{
     position: absolute;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-   height: 500px;  
-   width: 400px;
-   height: 20vh;
+    width: 100px;
+    height: 50px;
+    border-radius: 8px;
+    background-color: rgb(176, 176, 224);
+    top: 60%;
 }

@@ -1,5 +1,4 @@
 import { Fragment, useEffect, useState } from "react";
-// import classes from "./App.module.css";
 import Header from "./components/Header";
 import getCardsData from "./helpers/getApiData";
 import shuffleArray from "./helpers/shuffleArray";
@@ -11,13 +10,16 @@ import cardClickSound from "./music/cardClick.mp3";
 import cardShufflingSound from "./music/cards-shuffling.mp3";
 import winMessageSound from "./music/levelCompleted.mp3";
 import gameOverSound from "./music/gameOver.mp3";
+import winImage from "./images/winImage.jpeg";
+import gameOverImage from "./images/gameOverImage.jpeg";
+
 // import mainMusic from "./music/mainMusic.mp3";
 function App() {
   const [clickSound] = useSound(cardClickSound);
   const [shufflingSound] = useSound(cardShufflingSound);
   const [winSound] = useSound(winMessageSound);
   const [overSound] = useSound(gameOverSound);
-  // const [gameMusic] = useSound(mainMusic);
+  // const [gameMusic, { stop }] = useSound(mainMusic);
   //add an empty array that will hold and array of objects to create the cards.
   const [cardsData, setCardsData] = useState([]);
   //add an empty array to hold the cards that had been clicked
@@ -29,10 +31,12 @@ function App() {
   const [maxScore, setMaxScore] = useState(0);
   const [level, setLevel] = useState(1);
   //maybe chage this name to number of cards?
-  const [cardsToRetrieve, setCardsToRetrieve] = useState(4);
+  const numberOfCardsOnDeck = 6;
   const maxRandomNumber = 820;
   const [showGameOver, setShowGameOver] = useState(false);
   const [showWinMessage, setShowWinMessage] = useState(false);
+
+  const [flip, setFlip] = useState(false);
 
   //Handle Restart after game over
   const handleRestartGame = () => {
@@ -42,7 +46,7 @@ function App() {
     setShowGameOver(false);
     setScore(0);
     setLevel(1);
-    setCardsToRetrieve(4);
+    // setCardsToRetrieve(4);
     setShuffleCards(!shuffleCards);
   };
 
@@ -51,7 +55,7 @@ function App() {
     setScore(score + 1);
     setCardsData([]);
     setCardsClicked([]);
-    setCardsToRetrieve((prev) => prev + 4);
+    // setCardsToRetrieve((prev) => prev + 4);
     setLevel((prev) => prev + 1);
     setShuffleCards(!shuffleCards);
     shufflingSound();
@@ -64,7 +68,7 @@ function App() {
     const fethData = async () => {
       try {
         const charactersId = randomNumbersArray(
-          cardsToRetrieve,
+          numberOfCardsOnDeck,
           maxRandomNumber
         );
         const data = await getCardsData(charactersId);
@@ -76,7 +80,7 @@ function App() {
       }
     };
     fethData();
-  }, [shuffleCards, cardsToRetrieve]);
+  }, [shuffleCards]);
   /* eslint-disable react-hooks/exhaustive-deps */
 
   //render Max score when score changes and current level
@@ -89,18 +93,23 @@ function App() {
       //show game over message
       setShowGameOver(true);
       overSound();
-
+      // stop();
       return;
     }
 
     if (cardsClicked.length + 1 === cardsData.length) {
       //if all cards clicked on this deck of cards get new cards
       setShowWinMessage(true);
+      // stop();
       winSound();
       return;
     } else {
-      clickSound();
+      //card flip
       //active game
+      setFlip(!flip);
+      setTimeout(() => setFlip(false), 800);
+      clickSound();
+      // gameMusic();
       setCardsClicked((prev) => [...prev, data]);
       setScore(score + 1);
       //suffle existing card Deck
@@ -111,13 +120,18 @@ function App() {
     <Fragment>
       <Header score={score} maxScore={maxScore} level={level} />
       {gameIsActive && (
-        <CardDeck onCardClick={handleOnCardClick} cardsData={cardsData} />
+        <CardDeck
+          onCardClick={handleOnCardClick}
+          cardsData={cardsData}
+          flip={flip}
+        />
       )}
       {showGameOver && (
         <Modal
           mainMessage="GameOver"
           buttonText="restart"
           onClick={handleRestartGame}
+          backgrounImage={gameOverImage}
         />
       )}
       {showWinMessage && (
@@ -125,6 +139,7 @@ function App() {
           mainMessage="Congratulations!! you Win"
           buttonText="continue"
           onClick={handleWin}
+          backgrounImage={winImage}
         />
       )}
     </Fragment>
