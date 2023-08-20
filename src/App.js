@@ -10,8 +10,6 @@ import cardClickSound from "./music/cardClick.mp3";
 import cardShufflingSound from "./music/cards-shuffling.mp3";
 import winMessageSound from "./music/levelCompleted.mp3";
 import gameOverSound from "./music/gameOver.mp3";
-import winImage from "./images/winImage.jpeg";
-import gameOverImage from "./images/gameOverImage.jpeg";
 
 // import mainMusic from "./music/mainMusic.mp3";
 function App() {
@@ -131,7 +129,6 @@ function App() {
           mainMessage="GameOver"
           buttonText="restart"
           onClick={handleRestartGame}
-          backgrounImage={gameOverImage}
         />
       )}
       {showWinMessage && (
@@ -139,7 +136,6 @@ function App() {
           mainMessage="Congratulations!! you Win"
           buttonText="continue"
           onClick={handleWin}
-          backgrounImage={winImage}
         />
       )}
     </Fragment>

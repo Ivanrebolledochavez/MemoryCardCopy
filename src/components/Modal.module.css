@@ -24,20 +24,19 @@
    margin: 20px;
    border-radius: 18px;   
    text-align: center;
-  color: black;
+  color: white;
+  font-size: 20px
    
 }
 
 
 .message{
-    position:absolute;
-    top: 40%;
-
+   padding: 20px;
 }
 
 .button{
-    position: absolute;
-    width: 100px;
+    /* position: absolute; */
+    width: 150px;
     height: 50px;
     border-radius: 8px;
     background-color: rgb(176, 176, 224);
