@@ -80,7 +80,7 @@ function App() {
       }
     };
     fethData();
-  }, [getNewCards]);
+  }, [getNewCards, shufflingSound]);
 
   const handleOnCardClick = (event, data) => {
     if (cardsClicked.some((clickedCard) => clickedCard.id === data.id)) {
