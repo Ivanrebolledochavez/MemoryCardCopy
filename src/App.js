@@ -34,10 +34,19 @@ function App() {
 
   const [flip, setFlip] = useState(false);
 
+  // reset arrays containing data for cards and get new data
   const resetNGetNewCards = () => {
     setCardsData([]);
     setCardsClicked([]);
     setGetNewCards(!getNewCards);
+  };
+
+  //update score and max score
+  const updateScores = () => {
+    setScore(score + 1);
+    if (score >= maxScore) {
+      setMaxScore(score + 1);
+    }
   };
 
   //Handle Restart after game over
@@ -71,13 +80,7 @@ function App() {
       }
     };
     fethData();
-  }, [getNewCards, shufflingSound]);
-
-  useEffect(() => {
-    if (score >= maxScore) {
-      setMaxScore(score);
-    }
-  }, [score, maxScore]);
+  }, [getNewCards]);
 
   const handleOnCardClick = (event, data) => {
     if (cardsClicked.some((clickedCard) => clickedCard.id === data.id)) {
@@ -86,10 +89,9 @@ function App() {
       overSound();
       return;
     }
-    setScore(score + 1);
-    // if (score >= maxScore) {
-    //   setMaxScore(score);
-    // }
+
+    updateScores();
+
     if (cardsClicked.length + 1 === cardsData.length) {
       //if all cards clicked on this deck of cards get new cards
       setShowWinMessage(true);
