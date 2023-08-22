@@ -11,24 +11,22 @@ import cardShufflingSound from "./music/cards-shuffling.mp3";
 import winMessageSound from "./music/levelCompleted.mp3";
 import gameOverSound from "./music/gameOver.mp3";
 
-// import mainMusic from "./music/mainMusic.mp3";
 function App() {
   const [clickSound] = useSound(cardClickSound);
   const [shufflingSound] = useSound(cardShufflingSound);
   const [winSound] = useSound(winMessageSound);
   const [overSound] = useSound(gameOverSound);
-  // const [gameMusic, { stop }] = useSound(mainMusic);
+
   //add an empty array that will hold and array of objects to create the cards.
   const [cardsData, setCardsData] = useState([]);
   //add an empty array to hold the cards that had been clicked
   const [cardsClicked, setCardsClicked] = useState([]);
 
-  const [gameIsActive, setGameIsActive] = useState(true);
-  const [shuffleCards, setShuffleCards] = useState(false);
+  const [getNewCards, setGetNewCards] = useState(false);
   const [score, setScore] = useState(0);
   const [maxScore, setMaxScore] = useState(0);
+
   const [level, setLevel] = useState(1);
-  //maybe chage this name to number of cards?
   const numberOfCardsOnDeck = 6;
   const maxRandomNumber = 820;
   const [showGameOver, setShowGameOver] = useState(false);
@@ -36,32 +34,27 @@ function App() {
 
   const [flip, setFlip] = useState(false);
 
-  //Handle Restart after game over
-  const handleRestartGame = () => {
+  const resetNGetNewCards = () => {
     setCardsData([]);
     setCardsClicked([]);
-    setGameIsActive(true);
+    setGetNewCards(!getNewCards);
+  };
+
+  //Handle Restart after game over
+  const handleRestartGame = () => {
+    resetNGetNewCards();
     setShowGameOver(false);
     setScore(0);
     setLevel(1);
-    // setCardsToRetrieve(4);
-    setShuffleCards(!shuffleCards);
   };
 
   const handleWin = () => {
+    resetNGetNewCards();
     setShowWinMessage(false);
-    setScore(score + 1);
-    setCardsData([]);
-    setCardsClicked([]);
-    // setCardsToRetrieve((prev) => prev + 4);
     setLevel((prev) => prev + 1);
-    setShuffleCards(!shuffleCards);
-    shufflingSound();
   };
 
   //get cards data from API
-  /* eslint-disable react-hooks/exhaustive-deps */
-
   useEffect(() => {
     const fethData = async () => {
       try {
@@ -78,38 +71,37 @@ function App() {
       }
     };
     fethData();
-  }, [shuffleCards]);
-  /* eslint-disable react-hooks/exhaustive-deps */
+  }, [getNewCards, shufflingSound]);
 
-  //render Max score when score changes and current level
   useEffect(() => {
-    setMaxScore((prevMAxScore) => Math.max(prevMAxScore, score));
-  }, [score]);
+    if (score >= maxScore) {
+      setMaxScore(score);
+    }
+  }, [score, maxScore]);
 
   const handleOnCardClick = (event, data) => {
     if (cardsClicked.some((clickedCard) => clickedCard.id === data.id)) {
       //show game over message
       setShowGameOver(true);
       overSound();
-      // stop();
       return;
     }
-
+    setScore(score + 1);
+    // if (score >= maxScore) {
+    //   setMaxScore(score);
+    // }
     if (cardsClicked.length + 1 === cardsData.length) {
       //if all cards clicked on this deck of cards get new cards
       setShowWinMessage(true);
-      // stop();
       winSound();
       return;
     } else {
-      //card flip
       //active game
+      //card flip
       setFlip(!flip);
       setTimeout(() => setFlip(false), 800);
       clickSound();
-      // gameMusic();
       setCardsClicked((prev) => [...prev, data]);
-      setScore(score + 1);
       //suffle existing card Deck
       setCardsData((prevCardsData) => shuffleArray(prevCardsData));
     }
@@ -117,13 +109,13 @@ function App() {
   return (
     <Fragment>
       <Header score={score} maxScore={maxScore} level={level} />
-      {gameIsActive && (
-        <CardDeck
-          onCardClick={handleOnCardClick}
-          cardsData={cardsData}
-          flip={flip}
-        />
-      )}
+
+      <CardDeck
+        onCardClick={handleOnCardClick}
+        cardsData={cardsData}
+        flip={flip}
+      />
+
       {showGameOver && (
         <Modal
           mainMessage="GameOver"
