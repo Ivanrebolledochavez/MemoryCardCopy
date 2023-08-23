@@ -32,6 +32,7 @@ function App() {
   const [showGameOver, setShowGameOver] = useState(false);
   const [showWinMessage, setShowWinMessage] = useState(false);
   const flipDelay = 800;
+  const shufflingSoundDelay = 500;
   const [flip, setFlip] = useState(false);
 
   // reset arrays containing data for cards and get new data
@@ -39,7 +40,7 @@ function App() {
     setCardsData([]);
     setCardsClicked([]);
     setGetNewCards(!getNewCards);
-    setTimeout(() => shufflingSound(), 500);
+    setTimeout(() => shufflingSound(), shufflingSoundDelay);
   };
 
   //update score and max score
