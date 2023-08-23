@@ -1,10 +1,10 @@
 import { Fragment, useEffect, useState } from "react";
 import Header from "./components/Header";
+import CardDeck from "./components/CardDeck";
+import Modal from "./components/Modal";
 import getCardsData from "./helpers/getApiData";
 import shuffleArray from "./helpers/shuffleArray";
 import randomNumbersArray from "./helpers/randomNumbersArray";
-import CardDeck from "./components/CardDeck";
-import Modal from "./components/Modal";
 import useSound from "use-sound";
 import cardClickSound from "./music/cardClick.mp3";
 import cardShufflingSound from "./music/cards-shuffling.mp3";
@@ -31,7 +31,7 @@ function App() {
   const maxRandomNumber = 820;
   const [showGameOver, setShowGameOver] = useState(false);
   const [showWinMessage, setShowWinMessage] = useState(false);
-
+  const flipDelay = 800;
   const [flip, setFlip] = useState(false);
 
   // reset arrays containing data for cards and get new data
@@ -39,6 +39,7 @@ function App() {
     setCardsData([]);
     setCardsClicked([]);
     setGetNewCards(!getNewCards);
+    setTimeout(() => shufflingSound(), 500);
   };
 
   //update score and max score
@@ -73,14 +74,13 @@ function App() {
         );
         const data = await getCardsData(charactersId);
         const shuffledCards = shuffleArray(data);
-        shufflingSound();
         setCardsData(shuffledCards);
       } catch (error) {
         console.log(error);
       }
     };
     fethData();
-  }, [getNewCards, shufflingSound]);
+  }, [getNewCards]);
 
   const handleOnCardClick = (event, data) => {
     if (cardsClicked.some((clickedCard) => clickedCard.id === data.id)) {
@@ -101,7 +101,7 @@ function App() {
       //active game
       //card flip
       setFlip(!flip);
-      setTimeout(() => setFlip(false), 800);
+      setTimeout(() => setFlip(false), flipDelay);
       clickSound();
       setCardsClicked((prev) => [...prev, data]);
       //suffle existing card Deck
