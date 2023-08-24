@@ -45,10 +45,12 @@ function App() {
 
   //update score and max score
   const updateScores = () => {
-    setScore(score + 1);
-    if (score >= maxScore) {
-      setMaxScore(score + 1);
+    const updatedScore = score + 1;
+
+    if (updatedScore >= maxScore) {
+      setMaxScore(updatedScore);
     }
+    setScore(updatedScore);
   };
 
   //Handle Restart after game over

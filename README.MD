@@ -1,4 +1,4 @@
-## the following project is the memory card project for the Odin Project website.
+## The following project is the memory card project for the Odin Project course.
 ![screen Shot Of the game](Game.jpg)
 
 ### Created a game that's accessible at
@@ -30,4 +30,4 @@ I’m using the react-card-flip hook to flip cards on click
 
 ### Things that I need to work on.
 
-Originally, I had a main theme playing during the game. I intended to stop playing it when showing the modal, but if it played for a while, the music wouldn’t stop. So, I decided not to include it.
+Originally, I had a main theme playing during the game. I intended to stop playing it when showing the modal, but if it played for a while, the music wouldn’t stop. So, I decided not to include it. 
