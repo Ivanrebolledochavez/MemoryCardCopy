@@ -8,8 +8,6 @@ const getCardsData = async (charactersId) => {
     }
     const data = await results.json();
     return data;
-    // setCardsData(data);
-    // setCardsData((prev) => shuffle(prev));
   } catch (error) {
     throw error;
   }

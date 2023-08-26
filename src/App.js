@@ -22,7 +22,6 @@ function App() {
   //add an empty array to hold the cards that had been clicked
   const [cardsClicked, setCardsClicked] = useState([]);
 
-  const [getNewCards, setGetNewCards] = useState(false);
   const [score, setScore] = useState(0);
   const [maxScore, setMaxScore] = useState(0);
 
@@ -32,15 +31,29 @@ function App() {
   const [showGameOver, setShowGameOver] = useState(false);
   const [showWinMessage, setShowWinMessage] = useState(false);
   const flipDelay = 800;
-  const shufflingSoundDelay = 500;
   const [flip, setFlip] = useState(false);
+
+  //get data from api
+  const fetchData = async () => {
+    try {
+      const charactersId = randomNumbersArray(
+        numberOfCardsOnDeck,
+        maxRandomNumber
+      );
+      const data = await getCardsData(charactersId);
+      const shuffledCards = shuffleArray(data);
+      setCardsData(shuffledCards);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   // reset arrays containing data for cards and get new data
   const resetNGetNewCards = () => {
     setCardsData([]);
     setCardsClicked([]);
-    setGetNewCards(!getNewCards);
-    setTimeout(() => shufflingSound(), shufflingSoundDelay);
+    fetchData();
+    shufflingSound();
   };
 
   //update score and max score
@@ -70,21 +83,8 @@ function App() {
 
   //get cards data from API
   useEffect(() => {
-    const fethData = async () => {
-      try {
-        const charactersId = randomNumbersArray(
-          numberOfCardsOnDeck,
-          maxRandomNumber
-        );
-        const data = await getCardsData(charactersId);
-        const shuffledCards = shuffleArray(data);
-        setCardsData(shuffledCards);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fethData();
-  }, [getNewCards]);
+    fetchData();
+  }, []);
 
   const handleOnCardClick = (event, data) => {
     if (cardsClicked.some((clickedCard) => clickedCard.id === data.id)) {
@@ -102,7 +102,7 @@ function App() {
       winSound();
       return;
     } else {
-      //active game
+      //this code runs when  game is active not double clicks or win
       //card flip
       setFlip(!flip);
       setTimeout(() => setFlip(false), flipDelay);
